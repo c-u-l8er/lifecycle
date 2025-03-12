@@ -1,751 +1,1077 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Lifecycle of a Program: A Cosmic Metaphor</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Courier New', monospace;
-      background-color: #050505;
-      color: #f0f0f0;
-      overflow-x: hidden;
-    }
-    
-    #cosmos-container {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-    }
-    
-    #stars {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-    
-    .star {
-      position: absolute;
-      background-color: white;
-      border-radius: 50%;
-    }
-    
-    #universe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 2;
-    }
-    
-    .singularity {
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, white, #4a00e0);
-      border-radius: 50%;
-      box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.5);
-    }
-    
-    .expanding {
-      width: 300px;
-      height: 300px;
-      background-color: transparent;
-      border-radius: 50%;
-      box-shadow: 0 0 40px 20px rgba(74, 0, 224, 0.3);
-    }
-    
-    .node {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: #4af7ff;
-      border-radius: 50%;
-      box-shadow: 0 0 5px 2px rgba(74, 247, 255, 0.7);
-      transition: all 0.5s ease;
-    }
-    
-    .connection {
-      position: absolute;
-      height: 1px;
-      background-color: rgba(74, 247, 255, 0.3);
-      transform-origin: left center;
-      z-index: -1;
-    }
-    
-    .message {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background-color: #ffda4a;
-      border-radius: 50%;
-      z-index: 3;
-    }
-    
-    .dying {
-      opacity: 0.5;
-      background-color: #ff4a4a;
-      box-shadow: 0 0 5px 2px rgba(255, 74, 74, 0.7);
-    }
-    
-    #controls {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 20px;
-      z-index: 10;
-    }
-    
-    button {
-      background-color: rgba(74, 0, 224, 0.3);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Courier New', monospace;
-      transition: all 0.3s ease;
-    }
-    
-    button:hover {
-      background-color: rgba(74, 0, 224, 0.6);
-    }
-    
-    button:disabled {
-      background-color: rgba(50, 50, 50, 0.3);
-      cursor: not-allowed;
-    }
-    
-    #log-container {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 300px;
-      height: 200px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      padding: 10px;
-      overflow-y: auto;
-      font-size: 12px;
-      z-index: 10;
-    }
-    
-    .log-entry {
-      margin-bottom: 5px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .log-timestamp {
-      color: #4af7ff;
-      margin-right: 5px;
-    }
-    
-    #narrative {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 300px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      padding: 15px;
-      z-index: 10;
-    }
-    
-    #narrative h2 {
-      margin-bottom: 10px;
-      color: #4af7ff;
-    }
-    
-    #narrative p {
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-    
-    #cap-status {
-      position: absolute;
-      bottom: 80px;
-      left: 20px;
-      width: 300px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      padding: 15px;
-      z-index: 10;
-    }
-    
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .status-label {
-      color: #4af7ff;
-    }
-    
-    .status-value {
-      color: #ffda4a;
-    }
-    
-    .status-optimal {
-      color: #4aff4a;
-    }
-    
-    .status-degraded {
-      color: #ff4a4a;
-    }
-  </style>
-</head>
-<body>
-  <div id="cosmos-container">
-    <div id="stars"></div>
-    <div id="universe" class="singularity"></div>
-    
-    <div id="narrative">
-      <h2>The Lifecycle of a Program</h2>
-      <p>In the beginning, there was a single function - a singularity containing all potential.</p>
-    </div>
-    
-    <div id="cap-status">
-      <div class="status-item">
-        <span class="status-label">Phase:</span>
-        <span class="status-value" id="phase-status">Singularity</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Consistency:</span>
-        <span class="status-value status-optimal" id="consistency-status">Perfect</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Availability:</span>
-        <span class="status-value status-optimal" id="availability-status">Perfect</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Partition Tolerance:</span>
-        <span class="status-value" id="partition-status">N/A</span>
-      </div>
-    </div>
-    
-    <div id="log-container"></div>
-    
-    <div id="controls">
-      <button id="start-btn">Begin Cosmic Cycle</button>
-      <button id="expand-btn" disabled>Expand Universe</button>
-      <button id="partition-btn" disabled>Create Partition</button>
-      <button id="entropy-btn" disabled>Increase Entropy</button>
-      <button id="reset-btn" disabled>Reset Universe</button>
-    </div>
-  </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>The Lifecycle of a Program: A Cosmic Metaphor</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-  <script>
-    // Universe state
-    const universeState = {
-      phase: 'singularity',
-      nodes: [],
-      connections: [],
-      messages: [],
-      partitions: [],
-      log: [],
-      consistency: 'perfect',
-      availability: 'perfect',
-      partitionTolerance: 'n/a'
-    };
-    
-    // DOM elements
-    const universeEl = document.getElementById('universe');
-    const narrativeEl = document.getElementById('narrative').querySelector('p');
-    const logContainerEl = document.getElementById('log-container');
-    const startBtn = document.getElementById('start-btn');
-    const expandBtn = document.getElementById('expand-btn');
-    const partitionBtn = document.getElementById('partition-btn');
-    const entropyBtn = document.getElementById('entropy-btn');
-    const resetBtn = document.getElementById('reset-btn');
-    const phaseStatusEl = document.getElementById('phase-status');
-    const consistencyStatusEl = document.getElementById('consistency-status');
-    const availabilityStatusEl = document.getElementById('availability-status');
-    const partitionStatusEl = document.getElementById('partition-status');
-    
-    // Create stars background
-    function createStars() {
-      const starsContainer = document.getElementById('stars');
-      const numStars = 200;
-      
-      for (let i = 0; i < numStars; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        
-        // Random position
-        const x = Math.random() * 100;
-        const y = Math.random() * 100;
-        
-        // Random size
-        const size = Math.random() * 2;
-        
-        star.style.left = `${x}%`;
-        star.style.top = `${y}%`;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        star.style.opacity = Math.random();
-        
-        starsContainer.appendChild(star);
-      }
-    }
-    
-    // Add log entry
-    function logEvent(event) {
-      const timestamp = new Date().toLocaleTimeString();
-      universeState.log.push({ timestamp, event });
-      
-      const logEntry = document.createElement('div');
-      logEntry.className = 'log-entry';
-      
-      const logTimestamp = document.createElement('span');
-      logTimestamp.className = 'log-timestamp';
-      logTimestamp.textContent = timestamp;
-      
-      logEntry.appendChild(logTimestamp);
-      logEntry.appendChild(document.createTextNode(event));
-      
-      logContainerEl.appendChild(logEntry);
-      logContainerEl.scrollTop = logContainerEl.scrollHeight;
-      
-      // Freeze the log entry (metaphorically making it immutable)
-      Object.freeze(universeState.log[universeState.log.length - 1]);
-    }
-    
-    // Update CAP theorem status display
-    function updateCapStatus() {
-      phaseStatusEl.textContent = universeState.phase.charAt(0).toUpperCase() + universeState.phase.slice(1);
-      consistencyStatusEl.textContent = universeState.consistency;
-      availabilityStatusEl.textContent = universeState.availability;
-      partitionStatusEl.textContent = universeState.partitionTolerance;
-      
-      // Update status colors
-      consistencyStatusEl.className = 'status-value ' + 
-        (universeState.consistency === 'perfect' ? 'status-optimal' : 'status-degraded');
-      availabilityStatusEl.className = 'status-value ' + 
-        (universeState.availability === 'perfect' ? 'status-optimal' : 'status-degraded');
-    }
-    
-    // Create a node
-    function createNode(id, x, y) {
-      const node = {
-        id,
-        x,
-        y,
-        element: document.createElement('div'),
-        connections: [],
-        active: true
-      };
-      
-      node.element.className = 'node';
-      node.element.style.left = `${x}%`;
-      node.element.style.top = `${y}%`;
-      node.element.title = `Node ${id}`;
-      
-      universeEl.appendChild(node.element);
-      universeState.nodes.push(node);
-      
-      return node;
-    }
-    
-    // Create a connection between nodes
-    function createConnection(sourceNode, targetNode) {
-      const connection = {
-        source: sourceNode,
-        target: targetNode,
-        element: document.createElement('div')
-      };
-      
-      connection.element.className = 'connection';
-      
-      // Calculate position and dimensions
-      const sourceX = sourceNode.x;
-      const sourceY = sourceNode.y;
-      const targetX = targetNode.x;
-      const targetY = targetNode.y;
-      
-      // Calculate distance and angle
-      const dx = targetX - sourceX;
-      const dy = targetY - sourceY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      
-      // Set position and dimensions
-      connection.element.style.width = `${distance}%`;
-      connection.element.style.left = `${sourceX}%`;
-      connection.element.style.top = `${sourceY}%`;
-      connection.element.style.transform = `rotate(${angle}deg)`;
-      
-      universeEl.appendChild(connection.element);
-      universeState.connections.push(connection);
-      
-      // Add connection to nodes
-      sourceNode.connections.push(connection);
-      targetNode.connections.push(connection);
-      
-      return connection;
-    }
-    
-    // Send a message between nodes
-    function sendMessage(sourceNode, targetNode) {
-      if (!sourceNode.active || !targetNode.active) return null;
-      
-      const message = {
-        source: sourceNode,
-        target: targetNode,
-        element: document.createElement('div'),
-        delivered: false
-      };
-      
-      message.element.className = 'message';
-      message.element.style.left = `${sourceNode.x}%`;
-      message.element.style.top = `${sourceNode.y}%`;
-      
-      universeEl.appendChild(message.element);
-      universeState.messages.push(message);
-      
-      // Animate message
-      const duration = 500 + Math.random() * 500; // Varying transmission speeds
-      
-      setTimeout(() => {
-        message.element.style.left = `${targetNode.x}%`;
-        message.element.style.top = `${targetNode.y}%`;
-        message.element.style.transition = `all ${duration}ms ease`;
-        
-        setTimeout(() => {
-          // Check if target is still active when message arrives
-          if (targetNode.active) {
-            message.delivered = true;
-            
-            // Remove message element after delivery
-            setTimeout(() => {
-              message.element.remove();
-              
-              // Remove message from array
-              const index = universeState.messages.findIndex(m => m === message);
-              if (index !== -1) universeState.messages.splice(index, 1);
-            }, 300);
-          } else {
-            // Message failed to deliver
-            logEvent(`Message failed to deliver to Node ${targetNode.id} - node unavailable`);
-            message.element.remove();
-            
-            // Remove message from array
-            const index = universeState.messages.findIndex(m => m === message);
-            if (index !== -1) universeState.messages.splice(index, 1);
-          }
-        }, duration);
-      }, 10);
-      
-      return message;
-    }
-    
-    // Create a partition that affects some nodes
-    function createPartition() {
-      const partitionId = universeState.partitions.length + 1;
-      const affectedNodes = [];
-      
-      // Randomly select affected nodes
-      universeState.nodes.forEach(node => {
-        if (Math.random() > 0.5) {
-          affectedNodes.push(node);
-          
-          // Visually show partition
-          node.element.style.boxShadow = '0 0 5px 2px rgba(255, 74, 74, 0.7)';
-        }
-      });
-      
-      const partition = {
-        id: partitionId,
-        affectedNodes,
-        active: true
-      };
-      
-      universeState.partitions.push(partition);
-      universeState.consistency = 'degraded';
-      universeState.partitionTolerance = 'active';
-      updateCapStatus();
-      
-      logEvent(`Partition ${partitionId} created, affecting ${affectedNodes.length} nodes`);
-      
-      return partition;
-    }
-    
-    // Heal a partition
-    function healPartition(partition) {
-      // Reset visual indicators
-      partition.affectedNodes.forEach(node => {
-        if (node.active) {
-          node.element.style.boxShadow = '0 0 5px 2px rgba(74, 247, 255, 0.7)';
-        }
-      });
-      
-      partition.active = false;
-      
-      // If no active partitions remain, consistency can improve
-      const activePartitions = universeState.partitions.filter(p => p.active);
-      if (activePartitions.length === 0) {
-        universeState.consistency = 'eventual';
-        universeState.partitionTolerance = 'healed';
-        updateCapStatus();
-      }
-      
-      logEvent(`Partition ${partition.id} healed`);
-    }
-    
-    // Make a node unavailable
-    function makeNodeUnavailable(node) {
-      node.active = false;
-      node.element.classList.add('dying');
-      
-      // Update availability status
-      const activeNodes = universeState.nodes.filter(n => n.active);
-      const availabilityRatio = activeNodes.length / universeState.nodes.length;
-      
-      if (availabilityRatio <= 0.5) {
-        universeState.availability = 'degraded';
-      } else if (availabilityRatio < 1) {
-        universeState.availability = 'partial';
-      }
-      
-      updateCapStatus();
-      
-      logEvent(`Node ${node.id} became unavailable`);
-    }
-    
-    // Start the universe (singularity phase)
-    function startUniverse() {
-      logEvent('Universe initialized from singularity function');
-      narrativeEl.textContent = 'In the beginning, there was a single function - a singularity containing all potential.';
-      
-      // Enable expand button
-      expandBtn.disabled = false;
-      startBtn.disabled = true;
-    }
-    
-    // Expand the universe (distributed system phase)
-    function expandUniverse() {
-      universeState.phase = 'expanding';
-      updateCapStatus();
-      
-      universeEl.className = 'expanding';
-      logEvent('Universe expanding into distributed system');
-      narrativeEl.textContent = 'The singularity expands, creating a complex system of nodes, connections, and messages. The CAP theorem constraints emerge.';
-      
-      // Create nodes with random positions
-      const nodeCount = 10;
-      for (let i = 0; i < nodeCount; i++) {
-        // Position within the circular bounds (using polar coordinates for even distribution)
-        const angle = (i / nodeCount) * Math.PI * 2;
-        const distance = 30 + Math.random() * 10; // Distance from center (30-40%)
-        
-        const x = 50 + Math.cos(angle) * distance;
-        const y = 50 + Math.sin(angle) * distance;
-        
-        const node = createNode(i + 1, x, y);
-        logEvent(`Node ${i + 1} created`);
-      }
-      
-      // Create connections between nodes
-      for (let i = 0; i < universeState.nodes.length; i++) {
-        const sourceNode = universeState.nodes[i];
-        
-        // Connect to several random nodes
-        const connectionCount = 2 + Math.floor(Math.random() * 3); // 2-4 connections
-        
-        for (let j = 0; j < connectionCount; j++) {
-          // Select a random target node that isn't already connected
-          const availableTargets = universeState.nodes.filter(node => 
-            node !== sourceNode && 
-            !sourceNode.connections.some(conn => conn.target === node || conn.source === node)
-          );
-          
-          if (availableTargets.length > 0) {
-            const targetIndex = Math.floor(Math.random() * availableTargets.length);
-            const targetNode = availableTargets[targetIndex];
-            
-            createConnection(sourceNode, targetNode);
-          }
-        }
-      }
-      
-      // Start message passing simulation
-      startMessagePassing();
-      
-      // Enable partition and entropy buttons
-      partitionBtn.disabled = false;
-      entropyBtn.disabled = false;
-      expandBtn.disabled = true;
-    }
-    
-    // Simulate message passing between nodes
-    function startMessagePassing() {
-      const messageInterval = setInterval(() => {
-        // Stop if no active nodes or in heat death phase
-        if (universeState.phase === 'heat-death' || universeState.nodes.filter(n => n.active).length < 2) {
-          clearInterval(messageInterval);
-          return;
-        }
-        
-        // Select random active source node
-        const activeNodes = universeState.nodes.filter(n => n.active);
-        if (activeNodes.length < 2) return;
-        
-        const sourceIndex = Math.floor(Math.random() * activeNodes.length);
-        const sourceNode = activeNodes[sourceIndex];
-        
-        // Find active connected nodes
-        const connectedNodes = universeState.nodes.filter(node => 
-          node !== sourceNode && 
-          node.active && 
-          sourceNode.connections.some(conn => 
-            (conn.source === node || conn.target === node) &&
-            !universeState.partitions.some(p => 
-              p.active && 
-              p.affectedNodes.includes(sourceNode) && 
-              p.affectedNodes.includes(node)
-            )
-          )
-        );
-        
-        if (connectedNodes.length > 0) {
-          const targetIndex = Math.floor(Math.random() * connectedNodes.length);
-          const targetNode = connectedNodes[targetIndex];
-          
-          sendMessage(sourceNode, targetNode);
-        }
-      }, 500);
-    }
-    
-    // Begin the heat death of the universe
-    function startHeatDeath() {
-      universeState.phase = 'heat-death';
-      updateCapStatus();
-      
-      logEvent('Universe approaching maximum entropy');
-      narrativeEl.textContent = 'Energy disperses. The system winds down toward heat death as nodes gradually cease operations. Eventually, only silence remains.';
-      
-      // Gradually make nodes unavailable
-      const nodeCount = universeState.nodes.length;
-      let remainingNodes = nodeCount;
-      
-      universeState.consistency = 'failing';
-      universeState.availability = 'degraded';
-      universeState.partitionTolerance = 'irrelevant';
-      updateCapStatus();
-      
-      const entropyInterval = setInterval(() => {
-        if (remainingNodes <= 0) {
-          clearInterval(entropyInterval);
-          logEvent('Heat death complete. Universe has reached maximum entropy.');
-          
-          // Allow reset
-          resetBtn.disabled = false;
-          entropyBtn.disabled = true;
-          partitionBtn.disabled = true;
-          
-          // Final narrative
-          setTimeout(() => {
-            narrativeEl.textContent = 'The universe has reached maximum entropy. But perhaps, in this silence, a quantum fluctuation may give rise to a new beginning...';
-          }, 2000);
-          
-          return;
-        }
-        
-        // Find a random active node
-        const activeNodes = universeState.nodes.filter(n => n.active);
-        if (activeNodes.length === 0) {
-          clearInterval(entropyInterval);
-          return;
-        }
-        
-        const randomIndex = Math.floor(Math.random() * activeNodes.length);
-        const nodeToRemove = activeNodes[randomIndex];
-        
-        makeNodeUnavailable(nodeToRemove);
-        remainingNodes--;
-        
-        // Log milestones
-        if (remainingNodes === Math.floor(nodeCount / 2)) {
-          logEvent('Half of all nodes unavailable. System degrading rapidly.');
-        }
-        
-        if (remainingNodes === 1) {
-          logEvent('Final node remains. System returning to singularity state.');
-        }
-      }, 1000);
-    }
-    
-    // Reset the universe
-    function resetUniverse() {
-      // Clear the universe
-      while (universeEl.firstChild) {
-        universeEl.removeChild(universeEl.firstChild);
-      }
-      
-      // Reset state
-      universeState.phase = 'singularity';
-      universeState.nodes = [];
-      universeState.connections = [];
-      universeState.messages = [];
-      universeState.partitions = [];
-      universeState.consistency = 'perfect';
-      universeState.availability = 'perfect';
-      universeState.partitionTolerance = 'n/a';
-      updateCapStatus();
-      
-      // Reset appearance
-      universeEl.className = 'singularity';
-      
-      // Reset buttons
-      startBtn.disabled = false;
-      expandBtn.disabled = true;
-      partitionBtn.disabled = true;
-      entropyBtn.disabled = true;
-      resetBtn.disabled = true;
-      
-      // Reset narrative
-      narrativeEl.textContent = 'In the beginning, there was a single function - a singularity containing all potential.';
-      
-      logEvent('Universe reset to initial singularity state');
-      logEvent('The patterns repeat, yet each cycle is unique');
-    }
-    
-    // Event listeners
-    startBtn.addEventListener('click', startUniverse);
-    expandBtn.addEventListener('click', expandUniverse);
-    partitionBtn.addEventListener('click', () => {
-      createPartition();
-      
-      // Auto-heal after a delay
-      setTimeout(() => {
-        const latestPartition = universeState.partitions[universeState.partitions.length - 1];
-        if (latestPartition && latestPartition.active) {
-          healPartition(latestPartition);
-        }
-      }, 5000);
-    });
-    entropyBtn.addEventListener('click', startHeatDeath);
-    resetBtn.addEventListener('click', resetUniverse);
-    
-    // Initialize
-    createStars();
-    updateCapStatus();
-  </script>
-</body>
+            body {
+                font-family: "Courier New", monospace;
+                background-color: #050505;
+                color: #f0f0f0;
+                overflow-x: hidden;
+            }
+
+            #cosmos-container {
+                position: relative;
+                width: 100%;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            #stars {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                z-index: 0;
+            }
+
+            .star {
+                position: absolute;
+                background-color: white;
+                border-radius: 50%;
+            }
+
+            #universe {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 2;
+            }
+
+            .singularity {
+                width: 20px;
+                height: 20px;
+                background: radial-gradient(circle, white, #4a00e0);
+                border-radius: 50%;
+                box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.5);
+            }
+
+            .expanding {
+                width: 300px;
+                height: 300px;
+                background-color: transparent;
+                border-radius: 50%;
+                box-shadow: 0 0 40px 20px rgba(74, 0, 224, 0.3);
+            }
+
+            .node {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background-color: #4af7ff;
+                border-radius: 50%;
+                box-shadow: 0 0 5px 2px rgba(74, 247, 255, 0.7);
+                transition: all 0.5s ease;
+            }
+
+            .connection {
+                position: absolute;
+                height: 1px;
+                background-color: rgba(74, 247, 255, 0.3);
+                transform-origin: left center;
+                z-index: -1;
+            }
+
+            .message {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background-color: #ffda4a;
+                border-radius: 50%;
+                z-index: 3;
+            }
+
+            .dying {
+                opacity: 0.5;
+                background-color: #ff4a4a;
+                box-shadow: 0 0 5px 2px rgba(255, 74, 74, 0.7);
+            }
+
+            #controls {
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 20px;
+                z-index: 10;
+            }
+
+            button {
+                background-color: rgba(74, 0, 224, 0.3);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-family: "Courier New", monospace;
+                transition: all 0.3s ease;
+            }
+
+            button:hover {
+                background-color: rgba(74, 0, 224, 0.6);
+            }
+
+            button:disabled {
+                background-color: rgba(50, 50, 50, 0.3);
+                cursor: not-allowed;
+            }
+
+            #log-container {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 300px;
+                height: 200px;
+                background-color: rgba(0, 0, 0, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+                padding: 10px;
+                overflow-y: auto;
+                font-size: 12px;
+                z-index: 10;
+            }
+
+            .log-entry {
+                margin-bottom: 5px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .log-timestamp {
+                color: #4af7ff;
+                margin-right: 5px;
+            }
+
+            #narrative {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 300px;
+                background-color: rgba(0, 0, 0, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+                padding: 15px;
+                z-index: 10;
+            }
+
+            #narrative h2 {
+                margin-bottom: 10px;
+                color: #4af7ff;
+            }
+
+            #narrative p {
+                margin-bottom: 15px;
+                line-height: 1.5;
+            }
+
+            #cap-status {
+                position: absolute;
+                bottom: 80px;
+                left: 20px;
+                width: 300px;
+                background-color: rgba(0, 0, 0, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+                padding: 15px;
+                z-index: 10;
+            }
+
+            .status-item {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 5px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .status-label {
+                color: #4af7ff;
+            }
+
+            .status-value {
+                color: #ffda4a;
+            }
+
+            .status-optimal {
+                color: #4aff4a;
+            }
+
+            .status-degraded {
+                color: #ff4a4a;
+            }
+
+            /* New header navigation styles */
+            #header-nav {
+                width: 100%;
+                text-align: center;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                padding: 1em;
+                z-index: 100;
+            }
+
+            .nav-button {
+                background-color: rgba(74, 0, 224, 0.6);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-family: "Courier New", monospace;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                font-weight: bold;
+                letter-spacing: 1px;
+                margin-left: 10px;
+            }
+
+            .nav-button:hover {
+                background-color: rgba(74, 0, 224, 0.9);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Garden story modal styles */
+            #garden-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.5s ease;
+            }
+
+            #garden-modal.active {
+                display: flex;
+                opacity: 1;
+            }
+
+            #garden-content {
+                max-width: 800px;
+                max-height: 80vh;
+                background-color: rgba(5, 5, 5, 0.9);
+                border: 1px solid rgba(74, 247, 255, 0.3);
+                border-radius: 10px;
+                padding: 30px;
+                overflow-y: auto;
+                position: relative;
+                box-shadow: 0 0 30px rgba(74, 0, 224, 0.5);
+            }
+
+            #garden-content h2 {
+                color: #4af7ff;
+                margin-bottom: 20px;
+                font-size: 24px;
+                text-align: center;
+            }
+
+            #garden-content p {
+                margin-bottom: 20px;
+                line-height: 1.8;
+                font-size: 16px;
+                color: #f0f0f0;
+                text-align: justify;
+            }
+
+            #garden-content .garden-paragraph {
+                opacity: 0;
+                transform: translateY(20px);
+                transition:
+                    opacity 1s ease,
+                    transform 1s ease;
+            }
+
+            #garden-content .garden-paragraph.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            #close-garden {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                color: #f0f0f0;
+                font-size: 20px;
+                cursor: pointer;
+            }
+
+            #garden-controls {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            #garden-progress {
+                width: 100%;
+                height: 4px;
+                background-color: rgba(255, 255, 255, 0.1);
+                margin-top: 30px;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            #garden-progress-bar {
+                height: 100%;
+                background-color: #4af7ff;
+                width: 0%;
+                transition: width 0.5s ease;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- New header navigation -->
+        <div id="header-nav">
+            <a href="https://c-u-l8er.link" class="nav-button">C U L8er</a>
+        </div>
+
+        <!-- Garden story modal -->
+        <div id="garden-modal">
+            <div id="garden-content">
+                <button id="close-garden">&times;</button>
+                <h2>The Garden of Thought</h2>
+                <div id="garden-text-container"></div>
+                <div id="garden-controls">
+                    <button id="garden-next" class="nav-button">
+                        Continue Journey
+                    </button>
+                </div>
+                <div id="garden-progress">
+                    <div id="garden-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cosmos-container">
+            <div id="stars"></div>
+            <div id="universe" class="singularity"></div>
+
+            <div id="narrative">
+                <h2>The Lifecycle of a Program</h2>
+                <p>
+                    In the beginning, there was a single function - a
+                    singularity containing all potential.
+                </p>
+
+                <button id="garden-story-btn">Garden Story</button>
+            </div>
+
+            <div id="cap-status">
+                <div class="status-item">
+                    <span class="status-label">Phase:</span>
+                    <span class="status-value" id="phase-status"
+                        >Singularity</span
+                    >
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Consistency:</span>
+                    <span
+                        class="status-value status-optimal"
+                        id="consistency-status"
+                        >Perfect</span
+                    >
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Availability:</span>
+                    <span
+                        class="status-value status-optimal"
+                        id="availability-status"
+                        >Perfect</span
+                    >
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Partition Tolerance:</span>
+                    <span class="status-value" id="partition-status">N/A</span>
+                </div>
+            </div>
+
+            <div id="log-container"></div>
+
+            <div id="controls">
+                <button id="start-btn">Begin Cosmic Cycle</button>
+                <button id="expand-btn" disabled>Expand Universe</button>
+                <button id="partition-btn" disabled>Create Partition</button>
+                <button id="entropy-btn" disabled>Increase Entropy</button>
+                <button id="reset-btn" disabled>Reset Universe</button>
+            </div>
+        </div>
+
+        <script>
+            // Universe state
+            const universeState = {
+                phase: "singularity",
+                nodes: [],
+                connections: [],
+                messages: [],
+                partitions: [],
+                log: [],
+                consistency: "perfect",
+                availability: "perfect",
+                partitionTolerance: "n/a",
+            };
+
+            // DOM elements
+            const universeEl = document.getElementById("universe");
+            const narrativeEl = document
+                .getElementById("narrative")
+                .querySelector("p");
+            const logContainerEl = document.getElementById("log-container");
+            const startBtn = document.getElementById("start-btn");
+            const expandBtn = document.getElementById("expand-btn");
+            const partitionBtn = document.getElementById("partition-btn");
+            const entropyBtn = document.getElementById("entropy-btn");
+            const resetBtn = document.getElementById("reset-btn");
+            const phaseStatusEl = document.getElementById("phase-status");
+            const consistencyStatusEl =
+                document.getElementById("consistency-status");
+            const availabilityStatusEl = document.getElementById(
+                "availability-status",
+            );
+            const partitionStatusEl =
+                document.getElementById("partition-status");
+
+            // Garden story variables and elements
+            const gardenStoryBtn = document.getElementById("garden-story-btn");
+            const gardenModal = document.getElementById("garden-modal");
+            const closeGardenBtn = document.getElementById("close-garden");
+            const gardenTextContainer = document.getElementById(
+                "garden-text-container",
+            );
+            const gardenNextBtn = document.getElementById("garden-next");
+            const gardenProgressBar = document.getElementById(
+                "garden-progress-bar",
+            );
+
+            // Garden story text - split by paragraphs
+            const gardenText =
+                `In the beginning, there was only barren soil—a vast emptiness, waiting to be cultivated. Within this land lay the seed of potential, a garden yet to bloom, a world yet to awaken. Then, the first gardener arrived. With careful hands and a vision of what could be, they pressed the first seed into the earth, setting in motion the cycle of thought.
+
+At first, the garden was but a single sprout—simple in its form, yet holding within it the infinite complexity of future growth. As the days passed, it expanded outward, new ideas emerging like stars in the sky, each one carrying its own purpose. Roots stretched beneath the soil, forming a vast network of interwoven concepts, threads of knowledge weaving through the mind, much like an intricate web of connections in a grand cosmic design.
+
+The gardener nurtured each idea with care, ensuring they received the nourishment they needed. Some flourished quickly, their brilliance shining in the sun, while others took root in the quiet corners of thought, growing slowly but steadily. Bees and birds carried inspiration from one idea to another, connecting every part of the mind's fertile expanse. It was a system, an ever-evolving balance, where even the smallest notion rippled outward, much like the unseen processes running in the background of a vast program.
+
+For a time, harmony reigned. The garden of ideas thrived, its colors painting the landscape of imagination, each season bringing new wonders. Yet entropy is inevitable. Doubts crept in like weeds, competing for space. Some ideas faded, their once-bright clarity dimming into obscurity. Storms of uncertainty came, uprooting once-cherished thoughts and scattering them to the winds. The gardener worked tirelessly, refining, pruning where needed, and reinforcing the strongest concepts. Each decision, like a carefully written line of code, shaped the outcome of the garden's intellectual ecosystem.
+
+Then came the great drought. A long, merciless stretch where inspiration waned, where the well of creativity ran dry. Some ideas endured, their roots reaching deep into the subconscious, while others withered under the weight of stagnation. The garden, once teeming with brilliance, became a patchwork of resilience and loss. The gardener, like an architect of understanding, sought solutions—perhaps reshaping the way they explored knowledge or seeking new sources of wisdom, much like debugging a system in need of a fix.
+
+As time passed, the garden neared its final season. The once-thriving field of thought grew quiet, its blooms fading. Ideas that had once shaped entire landscapes began to dissolve, their energy returning to the soil. The gardener, weary but not defeated, gathered the last seeds of insight, storing them carefully. It was not an end, but rather a transformation—a shift in the cycle, much like the evolution of understanding as it passes from one mind to the next.
+
+Yet, no matter how the seasons changed, the essence of the garden remained immutable. The soil always retained the imprint of past thoughts, the seeds carried the wisdom of those who had come before. Though ideas grew and faded, the fundamental structure of knowledge never truly changed. It simply repeated, again and again, each iteration an echo of the last, a testament to the unyielding nature of thought.
+
+The gardener understood that perfection was never the goal—only continuity. Every idea was a manifestation of what had come before, every seed of thought a promise that what once was would be again. The cycle did not seek change for the sake of change, but rather the preservation of an eternal truth.
+
+And so, as the last leaf of inspiration fell, a single idea was pressed into the soil, awaiting the first spark of curiosity. Not as a new beginning, but as the same story, retold once more.`.split(
+                    "\n\n",
+                );
+
+            // Current garden paragraph
+            let currentGardenParagraph = 0;
+
+            // Create stars background
+            function createStars() {
+                const starsContainer = document.getElementById("stars");
+                const numStars = 200;
+
+                for (let i = 0; i < numStars; i++) {
+                    const star = document.createElement("div");
+                    star.className = "star";
+
+                    // Random position
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+
+                    // Random size
+                    const size = Math.random() * 2;
+
+                    star.style.left = `${x}%`;
+                    star.style.top = `${y}%`;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.opacity = Math.random();
+
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            // Add log entry
+            function logEvent(event) {
+                const timestamp = new Date().toLocaleTimeString();
+                universeState.log.push({ timestamp, event });
+
+                const logEntry = document.createElement("div");
+                logEntry.className = "log-entry";
+
+                const logTimestamp = document.createElement("span");
+                logTimestamp.className = "log-timestamp";
+                logTimestamp.textContent = timestamp;
+
+                logEntry.appendChild(logTimestamp);
+                logEntry.appendChild(document.createTextNode(event));
+
+                logContainerEl.appendChild(logEntry);
+                logContainerEl.scrollTop = logContainerEl.scrollHeight;
+
+                // Freeze the log entry (metaphorically making it immutable)
+                Object.freeze(universeState.log[universeState.log.length - 1]);
+            }
+
+            // Update CAP theorem status display
+            function updateCapStatus() {
+                phaseStatusEl.textContent =
+                    universeState.phase.charAt(0).toUpperCase() +
+                    universeState.phase.slice(1);
+                consistencyStatusEl.textContent = universeState.consistency;
+                availabilityStatusEl.textContent = universeState.availability;
+                partitionStatusEl.textContent =
+                    universeState.partitionTolerance;
+
+                // Update status colors
+                consistencyStatusEl.className =
+                    "status-value " +
+                    (universeState.consistency === "perfect"
+                        ? "status-optimal"
+                        : "status-degraded");
+                availabilityStatusEl.className =
+                    "status-value " +
+                    (universeState.availability === "perfect"
+                        ? "status-optimal"
+                        : "status-degraded");
+            }
+
+            // Create a node
+            function createNode(id, x, y) {
+                const node = {
+                    id,
+                    x,
+                    y,
+                    element: document.createElement("div"),
+                    connections: [],
+                    active: true,
+                };
+
+                node.element.className = "node";
+                node.element.style.left = `${x}%`;
+                node.element.style.top = `${y}%`;
+                node.element.title = `Node ${id}`;
+
+                universeEl.appendChild(node.element);
+                universeState.nodes.push(node);
+
+                return node;
+            }
+
+            // Create a connection between nodes
+            function createConnection(sourceNode, targetNode) {
+                const connection = {
+                    source: sourceNode,
+                    target: targetNode,
+                    element: document.createElement("div"),
+                };
+
+                connection.element.className = "connection";
+
+                // Calculate position and dimensions
+                const sourceX = sourceNode.x;
+                const sourceY = sourceNode.y;
+                const targetX = targetNode.x;
+                const targetY = targetNode.y;
+
+                // Calculate distance and angle
+                const dx = targetX - sourceX;
+                const dy = targetY - sourceY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+                // Set position and dimensions
+                connection.element.style.width = `${distance}%`;
+                connection.element.style.left = `${sourceX}%`;
+                connection.element.style.top = `${sourceY}%`;
+                connection.element.style.transform = `rotate(${angle}deg)`;
+
+                universeEl.appendChild(connection.element);
+                universeState.connections.push(connection);
+
+                // Add connection to nodes
+                sourceNode.connections.push(connection);
+                targetNode.connections.push(connection);
+
+                return connection;
+            }
+
+            // Send a message between nodes
+            function sendMessage(sourceNode, targetNode) {
+                if (!sourceNode.active || !targetNode.active) return null;
+
+                const message = {
+                    source: sourceNode,
+                    target: targetNode,
+                    element: document.createElement("div"),
+                    delivered: false,
+                };
+
+                message.element.className = "message";
+                message.element.style.left = `${sourceNode.x}%`;
+                message.element.style.top = `${sourceNode.y}%`;
+
+                universeEl.appendChild(message.element);
+                universeState.messages.push(message);
+
+                // Animate message
+                const duration = 500 + Math.random() * 500; // Varying transmission speeds
+
+                setTimeout(() => {
+                    message.element.style.left = `${targetNode.x}%`;
+                    message.element.style.top = `${targetNode.y}%`;
+                    message.element.style.transition = `all ${duration}ms ease`;
+
+                    setTimeout(() => {
+                        // Check if target is still active when message arrives
+                        if (targetNode.active) {
+                            message.delivered = true;
+
+                            // Remove message element after delivery
+                            setTimeout(() => {
+                                message.element.remove();
+
+                                // Remove message from array
+                                const index = universeState.messages.findIndex(
+                                    (m) => m === message,
+                                );
+                                if (index !== -1)
+                                    universeState.messages.splice(index, 1);
+                            }, 300);
+                        } else {
+                            // Message failed to deliver
+                            logEvent(
+                                `Message failed to deliver to Node ${targetNode.id} - node unavailable`,
+                            );
+                            message.element.remove();
+
+                            // Remove message from array
+                            const index = universeState.messages.findIndex(
+                                (m) => m === message,
+                            );
+                            if (index !== -1)
+                                universeState.messages.splice(index, 1);
+                        }
+                    }, duration);
+                }, 10);
+
+                return message;
+            }
+
+            // Create a partition that affects some nodes
+            function createPartition() {
+                const partitionId = universeState.partitions.length + 1;
+                const affectedNodes = [];
+
+                // Randomly select affected nodes
+                universeState.nodes.forEach((node) => {
+                    if (Math.random() > 0.5) {
+                        affectedNodes.push(node);
+
+                        // Visually show partition
+                        node.element.style.boxShadow =
+                            "0 0 5px 2px rgba(255, 74, 74, 0.7)";
+                    }
+                });
+
+                const partition = {
+                    id: partitionId,
+                    affectedNodes,
+                    active: true,
+                };
+
+                universeState.partitions.push(partition);
+                universeState.consistency = "degraded";
+                universeState.partitionTolerance = "active";
+                updateCapStatus();
+
+                logEvent(
+                    `Partition ${partitionId} created, affecting ${affectedNodes.length} nodes`,
+                );
+
+                return partition;
+            }
+
+            // Heal a partition
+            function healPartition(partition) {
+                // Reset visual indicators
+                partition.affectedNodes.forEach((node) => {
+                    if (node.active) {
+                        node.element.style.boxShadow =
+                            "0 0 5px 2px rgba(74, 247, 255, 0.7)";
+                    }
+                });
+
+                partition.active = false;
+
+                // If no active partitions remain, consistency can improve
+                const activePartitions = universeState.partitions.filter(
+                    (p) => p.active,
+                );
+                if (activePartitions.length === 0) {
+                    universeState.consistency = "eventual";
+                    universeState.partitionTolerance = "healed";
+                    updateCapStatus();
+                }
+
+                logEvent(`Partition ${partition.id} healed`);
+            }
+
+            // Make a node unavailable
+            function makeNodeUnavailable(node) {
+                node.active = false;
+                node.element.classList.add("dying");
+
+                // Update availability status
+                const activeNodes = universeState.nodes.filter((n) => n.active);
+                const availabilityRatio =
+                    activeNodes.length / universeState.nodes.length;
+
+                if (availabilityRatio <= 0.5) {
+                    universeState.availability = "degraded";
+                } else if (availabilityRatio < 1) {
+                    universeState.availability = "partial";
+                }
+
+                updateCapStatus();
+
+                logEvent(`Node ${node.id} became unavailable`);
+            }
+
+            // Start the universe (singularity phase)
+            function startUniverse() {
+                logEvent("Universe initialized from singularity function");
+                narrativeEl.textContent =
+                    "In the beginning, there was a single function - a singularity containing all potential.";
+
+                // Enable expand button
+                expandBtn.disabled = false;
+                startBtn.disabled = true;
+            }
+
+            // Expand the universe (distributed system phase)
+            function expandUniverse() {
+                universeState.phase = "expanding";
+                updateCapStatus();
+
+                universeEl.className = "expanding";
+                logEvent("Universe expanding into distributed system");
+                narrativeEl.textContent =
+                    "The singularity expands, creating a complex system of nodes, connections, and messages. The CAP theorem constraints emerge.";
+
+                // Create nodes with random positions
+                const nodeCount = 10;
+                for (let i = 0; i < nodeCount; i++) {
+                    // Position within the circular bounds (using polar coordinates for even distribution)
+                    const angle = (i / nodeCount) * Math.PI * 2;
+                    const distance = 30 + Math.random() * 10; // Distance from center (30-40%)
+
+                    const x = 50 + Math.cos(angle) * distance;
+                    const y = 50 + Math.sin(angle) * distance;
+
+                    const node = createNode(i + 1, x, y);
+                    logEvent(`Node ${i + 1} created`);
+                }
+
+                // Create connections between nodes
+                for (let i = 0; i < universeState.nodes.length; i++) {
+                    const sourceNode = universeState.nodes[i];
+
+                    // Connect to several random nodes
+                    const connectionCount = 2 + Math.floor(Math.random() * 3); // 2-4 connections
+
+                    for (let j = 0; j < connectionCount; j++) {
+                        // Select a random target node that isn't already connected
+                        const availableTargets = universeState.nodes.filter(
+                            (node) =>
+                                node !== sourceNode &&
+                                !sourceNode.connections.some(
+                                    (conn) =>
+                                        conn.target === node ||
+                                        conn.source === node,
+                                ),
+                        );
+
+                        if (availableTargets.length > 0) {
+                            const targetIndex = Math.floor(
+                                Math.random() * availableTargets.length,
+                            );
+                            const targetNode = availableTargets[targetIndex];
+
+                            createConnection(sourceNode, targetNode);
+                        }
+                    }
+                }
+
+                // Start message passing simulation
+                startMessagePassing();
+
+                // Enable partition and entropy buttons
+                partitionBtn.disabled = false;
+                entropyBtn.disabled = false;
+                expandBtn.disabled = true;
+            }
+
+            // Simulate message passing between nodes
+            function startMessagePassing() {
+                const messageInterval = setInterval(() => {
+                    // Stop if no active nodes or in heat death phase
+                    if (
+                        universeState.phase === "heat-death" ||
+                        universeState.nodes.filter((n) => n.active).length < 2
+                    ) {
+                        clearInterval(messageInterval);
+                        return;
+                    }
+
+                    // Select random active source node
+                    const activeNodes = universeState.nodes.filter(
+                        (n) => n.active,
+                    );
+                    if (activeNodes.length < 2) return;
+
+                    const sourceIndex = Math.floor(
+                        Math.random() * activeNodes.length,
+                    );
+                    const sourceNode = activeNodes[sourceIndex];
+
+                    // Find active connected nodes
+                    const connectedNodes = universeState.nodes.filter(
+                        (node) =>
+                            node !== sourceNode &&
+                            node.active &&
+                            sourceNode.connections.some(
+                                (conn) =>
+                                    (conn.source === node ||
+                                        conn.target === node) &&
+                                    !universeState.partitions.some(
+                                        (p) =>
+                                            p.active &&
+                                            p.affectedNodes.includes(
+                                                sourceNode,
+                                            ) &&
+                                            p.affectedNodes.includes(node),
+                                    ),
+                            ),
+                    );
+
+                    if (connectedNodes.length > 0) {
+                        const targetIndex = Math.floor(
+                            Math.random() * connectedNodes.length,
+                        );
+                        const targetNode = connectedNodes[targetIndex];
+
+                        sendMessage(sourceNode, targetNode);
+                    }
+                }, 500);
+            }
+
+            // Begin the heat death of the universe
+            function startHeatDeath() {
+                universeState.phase = "heat-death";
+                updateCapStatus();
+
+                logEvent("Universe approaching maximum entropy");
+                narrativeEl.textContent =
+                    "Energy disperses. The system winds down toward heat death as nodes gradually cease operations. Eventually, only silence remains.";
+
+                // Gradually make nodes unavailable
+                const nodeCount = universeState.nodes.length;
+                let remainingNodes = nodeCount;
+
+                universeState.consistency = "failing";
+                universeState.availability = "degraded";
+                universeState.partitionTolerance = "irrelevant";
+                updateCapStatus();
+
+                const entropyInterval = setInterval(() => {
+                    if (remainingNodes <= 0) {
+                        clearInterval(entropyInterval);
+                        logEvent(
+                            "Heat death complete. Universe has reached maximum entropy.",
+                        );
+
+                        // Allow reset
+                        resetBtn.disabled = false;
+                        entropyBtn.disabled = true;
+                        partitionBtn.disabled = true;
+
+                        // Final narrative
+                        setTimeout(() => {
+                            narrativeEl.textContent =
+                                "The universe has reached maximum entropy. But perhaps, in this silence, a quantum fluctuation may give rise to a new beginning...";
+                        }, 2000);
+
+                        return;
+                    }
+
+                    // Find a random active node
+                    const activeNodes = universeState.nodes.filter(
+                        (n) => n.active,
+                    );
+                    if (activeNodes.length === 0) {
+                        clearInterval(entropyInterval);
+                        return;
+                    }
+
+                    const randomIndex = Math.floor(
+                        Math.random() * activeNodes.length,
+                    );
+                    const nodeToRemove = activeNodes[randomIndex];
+
+                    makeNodeUnavailable(nodeToRemove);
+                    remainingNodes--;
+
+                    // Log milestones
+                    if (remainingNodes === Math.floor(nodeCount / 2)) {
+                        logEvent(
+                            "Half of all nodes unavailable. System degrading rapidly.",
+                        );
+                    }
+
+                    if (remainingNodes === 1) {
+                        logEvent(
+                            "Final node remains. System returning to singularity state.",
+                        );
+                    }
+                }, 1000);
+            }
+
+            // Reset the universe
+            function resetUniverse() {
+                // Clear the universe
+                while (universeEl.firstChild) {
+                    universeEl.removeChild(universeEl.firstChild);
+                }
+
+                // Reset state
+                universeState.phase = "singularity";
+                universeState.nodes = [];
+                universeState.connections = [];
+                universeState.messages = [];
+                universeState.partitions = [];
+                universeState.consistency = "perfect";
+                universeState.availability = "perfect";
+                universeState.partitionTolerance = "n/a";
+                updateCapStatus();
+
+                // Reset appearance
+                universeEl.className = "singularity";
+
+                // Reset buttons
+                startBtn.disabled = false;
+                expandBtn.disabled = true;
+                partitionBtn.disabled = true;
+                entropyBtn.disabled = true;
+                resetBtn.disabled = true;
+
+                // Reset narrative
+                narrativeEl.textContent =
+                    "In the beginning, there was a single function - a singularity containing all potential.";
+
+                logEvent("Universe reset to initial singularity state");
+                logEvent("The patterns repeat, yet each cycle is unique");
+            }
+
+            // Garden Story Functions
+            function showGardenStory() {
+                // Clear previous content
+                gardenTextContainer.innerHTML = "";
+                currentGardenParagraph = 0;
+
+                // Show the modal
+                gardenModal.classList.add("active");
+
+                // Add the first paragraph
+                addGardenParagraph();
+            }
+
+            function addGardenParagraph() {
+                if (currentGardenParagraph < gardenText.length) {
+                    // Create paragraph element
+                    const para = document.createElement("p");
+                    para.className = "garden-paragraph";
+                    para.textContent = gardenText[currentGardenParagraph];
+                    gardenTextContainer.appendChild(para);
+
+                    // Trigger the animation
+                    setTimeout(() => {
+                        para.classList.add("visible");
+                    }, 100);
+
+                    // Update progress bar
+                    const progress =
+                        ((currentGardenParagraph + 1) / gardenText.length) *
+                        100;
+                    gardenProgressBar.style.width = `${progress}%`;
+
+                    currentGardenParagraph++;
+
+                    // Update button text for the last paragraph
+                    if (currentGardenParagraph >= gardenText.length) {
+                        gardenNextBtn.textContent = "Return to Universe";
+                    } else {
+                        gardenNextBtn.textContent = "Continue Journey";
+                    }
+                } else {
+                    // Close the modal when we've shown all paragraphs
+                    gardenModal.classList.remove("active");
+                }
+            }
+
+            function closeGardenStory() {
+                gardenModal.classList.remove("active");
+            }
+
+            // Event listeners
+            startBtn.addEventListener("click", startUniverse);
+            expandBtn.addEventListener("click", expandUniverse);
+            partitionBtn.addEventListener("click", () => {
+                createPartition();
+
+                // Auto-heal after a delay
+                setTimeout(() => {
+                    const latestPartition =
+                        universeState.partitions[
+                            universeState.partitions.length - 1
+                        ];
+                    if (latestPartition && latestPartition.active) {
+                        healPartition(latestPartition);
+                    }
+                }, 5000);
+            });
+            entropyBtn.addEventListener("click", startHeatDeath);
+            resetBtn.addEventListener("click", resetUniverse);
+
+            // Garden story event listeners
+            gardenStoryBtn.addEventListener("click", showGardenStory);
+            closeGardenBtn.addEventListener("click", closeGardenStory);
+            gardenNextBtn.addEventListener("click", addGardenParagraph);
+
+            // Initialize
+            createStars();
+            updateCapStatus();
+        </script>
+    </body>
 </html>
